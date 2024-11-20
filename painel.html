@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="stilize.css">
+
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ </head>
+ <body>
+
+<style>
+ body {
+ font-family: Arial, sans-serif;
+ margin: 0;
+ background-color: white;
+  
+ }
+  
+ 
+  
+ header {
+ display: flex;
+ align-items: center; /* Alinha verticalmente no centro */
+ padding: 15px;
+ border-bottom: 1px solid #ccc;
+ margin-bottom: 50px; 
+ }
+
+ 
+  
+ .logo {
+ color: purple;
+ font-size: 22px;
+ font-weight: bolder;
+ text-align: center;
+ margin-left: 100px;
+ margin-right: 0px;
+ line-height: 1.5;
+ text-align: center;
+ }
+  
+ 
+  
+ .card {
+ display: inline-block;
+ margin-right: 0px; /* Para adicionar algum espaço entre os cards */
+}
+
+
+.card {
+ width: 140px;
+ height: 50px;
+ border: 1px solid #ccc;
+ margin-left: 24px;
+ margin-top: 15px;
+ justify-content: center;
+ align-items: center;
+ background: purple;
+ border-radius: 10px 0px; 
+ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+ 
+}  
+          
+ .card:hover {
+ background-color: none;
+   
+}
+
+.name {
+ font-size: 16px;
+ text-align: center;
+ font-weight: bold;
+ color: white;
+ margin-top: 15px;
+  
+}
+  
+  .menu {
+ height: 50px;
+ background: white;
+ margin-top: 54.50%;
+ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+ border: 10px;
+ border-radius: 10px solid #ccc;
+ padding: 10px;
+}
+
+ a {
+ font-size: 15px;
+ margin-top: 20px;
+ color: #333;
+ text-decoration: none;
+ padding: 8px;
+ border-radius: 5px;
+ font-weight: bold;
+ margin-left: 20px;
+}
+
+
+
+ 
+
+ a:hover {
+ background-color: orange;
+ color: #ffffff;
+}
+</style>
+ 
+ <header>
+ <div class="logo">Meu painel</div>
+ </header>
+  
+ <div class="card" onclick="redirecionar('emprestimo.html')">
+ <div class="name">Empréstimos</div>
+ </div>
+
+ <div class="card" onclick="redirecionar('contas.html')">
+ <div class="name">Contas</div>
+ </div>
+
+ <div class= "card" onclick="redirecionar('Gastos.html')">
+ <div class="name">Compras</div>
+ </div>
+
+ 
+
+
+ 
+
+
+
+ <div class= "card" onclick="redirecionar('p-corporal.html')">
+ <div class="name">P/corporal</div>
+ </div>
+ </div>
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+  
+  
+  
+  
+  
+  
+
+<div class="menu">
+
+<a href="dados.html">Meus dados</a>
+<a href="informação.html">Informações</a>
+<a href="index.html">Sair</a>
+
+
+
+
+<script defer src="caminho.js"></script>
+<script>
+    function redirecionar(url) {
+        window.location.href = url;
+    }
+
+    // Função para habilitar a edição do cabeçalho
+    function habilitarEdicao() {
+        var header = document.getElementById("headerText");
+        header.focus();
+    }
+
+    // Função para selecionar e exibir uma imagem
+    function selecionarImagem() {
+        var imagemInput = document.getElementById("imagemInput");
+        imagemInput.click();
+
+        imagemInput.addEventListener("change", function () {
+            var logo = document.getElementById("logo");
+            var file = imagemInput.files[0];
+            var reader = new FileReader();
+
+            reader.onload = function () {
+                logo.src = reader.result;
+                // Salvar a imagem no armazenamento local
+                localStorage.setItem("imagem", reader.result);
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // Carregar imagem do armazenamento local ao carregar a página
+    var imagemSalva = localStorage.getItem("imagem");
+    if (imagemSalva) {
+        var logo = document.getElementById("logo");
+        logo.src = imagemSalva;
+    }
+
+    // Prevenir quebra de linha e limitar overflow
+    function preventOverflow(element) {
+        element.style.whiteSpace = "nowrap";
+        element.style.overflow = "hidden";
+        element.style.textOverflow = "ellipsis";
+    }
+
+    function preventLineBreak(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+        }
+    }
+
+    // Aplicar a função de prevenir overflow no h1 do cabeçalho
+    var headerText = document.getElementById("headerText");
+    preventOverflow(headerText);
+
+    headerText.addEventListener("input", function () {
+        // Salvar o texto do cabeçalho no armazenamento local
+        localStorage.setItem("cabecalho", headerText.textContent);
+    });
+
+    // Carregar texto do cabeçalho do armazenamento local ao carregar a página
+    var cabecalhoSalvo = localStorage.getItem("cabecalho");
+    if (cabecalhoSalvo) {
+        headerText.textContent = cabecalhoSalvo;
+    }
+</script>
+
+
+ 
+ <!-- javascript do menu -->
+ <script>
+ // JavaScript não é mais necessário para exibir/ocultar o menu
+ function toggleMenu() {
+ const sidebar = document.getElementById('sidebar');
+ sidebar.style.display = (sidebar.style.display === 'block') ? 'none' : 'block';
+ }
+</script>
+</body>
+</html>
+  

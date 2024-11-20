@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dados Recebidos</title>
+</head>
+<body>
+  
+<style>
+ body {
+ font-family: Arial, sans-serif;
+ margin: 0;
+       
+ }
+
+ .arrow {
+ display: inline-block;
+ width: 10px;
+ height: 10px;
+ border-top: 2px solid #f2f2f2;
+ border-right: 2px solid #f2f2f2;
+ transform: rotate(-130deg);
+ position: absolute;
+ top: 21px;
+ left: 15px;
+        
+ }
+
+ header {
+ background: purple;
+ padding: 15px;
+
+ }
+
+ .title {
+ color: white;
+ font-size: 20px;
+ font-weight: bold;
+ text-align: center;
+ margin-left: 0px;
+ margin-right: 0px;
+     
+}   
+        
+ #dados {
+ background-color: white;
+ padding: 5px;
+ border: 1px solid #ddd;
+ border-radius: 5px;
+ max-width: 400px;
+ margin-top: 40px;
+ margin-left: 10px;
+ margin-right: 10px;
+
+}
+       
+ 
+ #dados p {
+ font-size: 17px;
+ margin: 10px 0;
+ color: black;   
+ margin-left: 10px;
+}
+        
+ #dados p span {
+ font-size: 16px;
+ color: #444;
+ 
+}
+
+p {
+color: black;
+margin-left: 10px;
+margin-right: 0px;
+} 
+ 
+ #email-label {
+ color: blue;
+ font-weight: bold;
+        
+}
+  
+ #senha-label {
+ color: red;
+ font-style: italic;
+        
+}
+ 
+ .container {
+ display: flex;
+ flex-direction: column;
+ justify-content: absolute;
+ align-items: center;
+ background: white;
+ text-align: center;
+ border-radius: 10px;
+ margin-left: 0px;
+ margin-right: 0px;
+ margin-top: 20px;
+
+}
+
+ .text {
+ color: black;
+ font-size: 17px;
+ font-weight: bold;
+ margin-top: 30px;
+ text-align: absolute;
+ margin-bottom: 30px;
+ margin-left: 16px;
+ }
+
+ .cadastrar, .senha {
+ color: black;
+ font-size: 16px;
+ font-weight: bold;
+ margin-top: 30px;
+    
+}
+  
+  input[type="email"], input[type="password"] {
+  width: 91%;
+  padding: 15px;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 15px;
+  outline: none;
+  margin-left: 15px;
+  margin-right: 0px;
+
+  }
+
+  button {
+  width: 28%;
+  padding: 10px;
+  background: purple;
+  border: none;
+  border-radius: 5px;
+  color: #f2f2f2;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-left: 35%;
+
+}
+
+button:hover {
+background-color: goldenrod;
+
+}
+</style>
+
+ <a href="painel.html">
+ <span class="arrow"></span>
+ </a>
+ </div>
+ 
+<header>
+ <div class="title">Meus dados</div>
+ </header> 
+ </div>
+ </div>
+ 
+ <div id="dados">
+  <p>Senha: <span id="senha"></span></p>
+</div>
+
+<div class="text">Trocar senha!</div>
+
+<input type="password" id="newPassword" placeholder="Digite sua nova senha">
+<button onclick="updateUser()">Atualizar</button>
+
+<p id="updateMessage"></p>
+
+<script>
+    // Função para carregar a senha do localStorage e exibir na página
+    function loadUserData() {
+        var senha = localStorage.getItem("cadastroSenha");
+
+        // Verifica se a senha existe no localStorage
+        if (senha) {
+            document.getElementById('senha').textContent = senha;
+        } else {
+            document.getElementById('senha').textContent = 'Nenhuma senha cadastrada';
+        }
+    }
+
+    // Função para atualizar a senha
+    function updateUser() {
+        var newPasswordInput = document.getElementById("newPassword");
+        var updateMessage = document.getElementById("updateMessage");
+
+        var newPassword = newPasswordInput.value;
+
+        if (newPassword) {
+            // Atualizar a senha no localStorage
+            localStorage.setItem("cadastroSenha", newPassword);
+
+            // Atualizar os dados exibidos na página
+            loadUserData();
+
+            // Limpar campo de input
+            newPasswordInput.value = "";
+
+            updateMessage.textContent = "Senha atualizada com sucesso.";
+        } else {
+            updateMessage.textContent = "A nova senha não pode estar em branco.";
+        }
+    }
+
+    // Chamar a função ao carregar a página para exibir os dados cadastrados
+    window.onload = loadUserData;
+</script>

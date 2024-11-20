@@ -1,0 +1,164 @@
+ <!DOCTYPE html>
+ <html lang="pt-br">
+ <head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Exibir/Ocultar Senha</title>
+  <style>
+  body {
+  font-family: Arial, sans-serif;
+   margin: 0px;
+  }
+
+ header {
+ padding: 15px;
+ border-bottom: 1px solid #ccc;
+}
+
+.logo {
+ font-size: 28px;
+ font-weight: bold;
+ text-align: absolute;  
+ margin-left: 0px;
+ color: purple;
+}
+
+.text {
+color: #555;
+font-size: 20px;
+font-weight: bold;
+text-align: center; 
+margin-top: 30px;
+margin-left: 0px;
+}
+  
+.card {
+      background-color: #fff;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      margin-top: 50px;
+      justify-content: center;
+      align-items: center;
+      margin-left: 9px;
+  }
+
+    
+
+  
+  .card button {
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 30px;
+  font-size: 15px;
+  margin-left: 35%;
+  background: purple;
+ }
+  
+  
+    input[type="password"],
+    input[type="text"] {
+      width: 90%;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    input[type="checkbox"] {
+      margin-right: 8px;
+      
+    }
+
+    label {
+      font-size: 14px;
+      color: #555;
+   
+ }
+
+    input[type="checkbox"]:checked + label {
+      font-weight: bold;
+      color: purple;
+      
+    }
+
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      margin-top: 0px;
+     
+    }
+  
+  message {
+  color lime;
+  }
+  
+  </style>
+</head>
+<body>
+
+  <header>
+ <div class="logo">Lopixe</div>
+ 
+ </header>
+ </div>
+ <div class="text">Fazer login</div>
+  
+<div class="card">
+<input type="password" id="password" placeholder="Digite sua senha">
+
+  <div class="toggle-container">
+    <input type="checkbox" id="togglePassword">
+    <label for="togglePassword">Mostrar senha</label>
+  </div>
+
+  <button onclick="login()">Entrar</button>
+</div>
+
+<p id="message"></p>
+
+<script>
+  // Alternar visibilidade da senha
+  document.getElementById('togglePassword').addEventListener('change', function() {
+    var passwordInput = document.getElementById("password");
+    
+    if (this.checked) {
+      passwordInput.type = "text";  // Exibe a senha
+    } else {
+      passwordInput.type = "password";  // Oculta a senha
+    }
+  });
+
+  // Função para fazer login
+  function login() {
+    var password = document.getElementById("password").value; // Obtém o valor da senha digitada
+    var messageElement = document.getElementById("message"); // Elemento para exibir a mensagem
+    var storedPassword = localStorage.getItem("cadastroSenha"); // Obtém a senha cadastrada (correção na chave)
+
+    if (password === "") {
+      // Se a senha estiver vazia, exibe a mensagem de aviso
+      messageElement.textContent = "Por favor, digite sua senha";
+      messageElement.style.color = "purple"; // Mensagem em vermelho
+    } else if (password === storedPassword) {
+      // Se a senha for igual à armazenada
+      messageElement.textContent = "Login bem-sucedido!";
+      messageElement.style.color = "green"; // Mensagem de sucesso em verde
+
+      // Redireciona o usuário para a página principal após o login bem-sucedido
+      setTimeout(function() {
+        window.location.href = "painel.html"; // Redireciona para a página desejada
+      }, 1000); // Espera 1 segundo antes do redirecionamento
+    } else {
+      // Se a senha estiver incorreta
+      messageElement.textContent = "Senha incorreta, tente novamente.";
+      messageElement.style.color = "lime"; // Mensagem de erro em vermelho
+    }
+  }
+</script>
