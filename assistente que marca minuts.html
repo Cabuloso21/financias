@@ -1,0 +1,286 @@
+ <!DOCTYPE html>
+ <html lang="pt-BR">
+ <head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ 
+<style>
+ body {
+ margin: 0px;
+ background: white;
+ font-family: Roboto, sans-serif;
+}
+   
+ header {
+ background: #9370DB;
+ padding: 20px;
+
+}
+
+.logo {
+ font-weight: bold;
+ font-size: 25px;
+
+}
+
+.text {
+ color: #666;
+ font-size: 25px;
+ font-weight: bold;
+ text-align: center;
+ margin-top: 50px;
+ margin-left: 20px;
+ margin-right: 20px;
+
+}
+
+ .timer {
+ margin-bottom: 20px;
+ margin-top: 0px;
+ margin-left: 10px;
+ margin-right: 10px;
+ padding: 10px;
+ border: 1px solid #ccc;
+ border-radius: 5px;
+ color: #FF7700;
+
+}
+  
+ .mouth {
+ width: 30px;
+ height: 30px;
+ background-color: white;
+ border-radius: 50% 50%;
+ border: 40px solid #9370DB;
+ margin: 50px auto;
+ animation: mouthAnimation 0.5s ease-in-out infinite;
+  
+}
+
+ @keyframes mouthAnimation {
+ 0% { transform: scale(1); }
+ 50% { transform: scale(0.9); }
+ 100% { transform: scale(1); }
+    
+}
+
+ #cardContainer {
+ display: none;
+ text-align: center;
+ margin-top: 20px;
+    
+}
+
+ #countdown {
+ font-size: 18px;
+ 
+}
+
+ #reason {
+ font-size: 16px;
+    
+}
+  
+ button {
+ padding: 10px 20px;
+ font-size: 16px;
+ margin-left: 97px;
+ margin-bottom: 30px; 
+ cursor: pointer;
+ background: #9370DB;
+ color: #666;
+ border: none;
+ border-radius: 5px;
+ font-weight: bold;
+ top: 60%;
+ text-align: center;
+ 
+}
+    
+ button:hover {
+ background-color: #9370DB;
+   
+}
+
+</style>
+ </head>
+ <body>
+
+ <header>
+ <div class="logo">Azuis</div>
+ </header>
+
+ <div class="text">Assistente para marcar tempo</div>
+
+ <div class="mouth" id="mouth"></div> <!-- Animação de boca -->
+
+ <button onclick="activateVoice24Hours()">Ativar assistente</button>
+
+ <div id="timerContainer"></div> <!-- Contêiner para exibir todos os timers -->
+ </div>
+ </div>
+
+
+<script>
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
+  recognition.lang = "pt-BR";
+  
+  const timerContainer = document.getElementById("timerContainer");
+  const mouthElement = document.getElementById("mouth");
+  let awaitingReason = false;
+  let pendingTimer = null;
+  let isSpeaking = false;
+  let isVoiceActive = false; // Flag para indicar se o modo de voz está ativo
+
+  const numberMap = {
+    "um": 1, "dois": 2, "três": 3, "quatro": 4, "cinco": 5,
+    "seis": 6, "sete": 7, "oito": 8, "nove": 9, "dez": 10,
+    "onze": 11, "doze": 12, "treze": 13, "quatorze": 14, "quinze": 15,
+    "dezesseis": 16, "dezessete": 17, "dezoito": 18, "dezenove": 19, "vinte": 20
+  };
+
+  let timers = []; // Lista de timers ativos
+
+  function activateVoice24Hours() {
+    const endTime = Date.now() + 24 * 60 * 60 * 1000; // Define o tempo final após 24 horas
+    speak("Olá, meu nome é lilia, sou sua assistente virtual. No que posso ajudar?");
+    listenContinuously(endTime);
+    isVoiceActive = true; // Marca que a voz está ativada
+  }
+
+  function listenContinuously(endTime) {
+    recognition.start();
+
+    recognition.onstart = () => {
+      console.log("Estou ouvindo...");
+    };
+
+    recognition.onresult = (event) => {
+      const command = event.results[0][0].transcript.toLowerCase();
+      console.log("Comando recebido: ", command);
+
+      // Se o usuário disser "ficar desativada", desativa o modo de voz
+      if (command.includes("ficar desativada")) {
+        deactivateVoice();
+      } else if (awaitingReason) {
+        handleReasonCommand(command);
+      } else if (command.includes("ativar voz")) {
+        activateVoice24Hours(); // Ativa o modo de voz
+      } else {
+        handleTimerCommand(command); // Lida com a marcação do tempo
+      }
+    };
+
+    recognition.onend = () => {
+      // A IA continua ouvindo se não estiver desativada
+      if (isVoiceActive) {
+        recognition.start();
+      } else {
+        speak("Modo de voz desativado. Diga 'ativar voz' para reativar.");
+      }
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Erro de reconhecimento de fala: ", event.error);
+      if (isVoiceActive) {
+        recognition.start(); // Reinicia se a voz estiver ativada
+      }
+    };
+  }
+
+  function deactivateVoice() {
+    recognition.stop(); // Para o reconhecimento de voz
+    isVoiceActive = false; // Marca que a voz está desativada
+    speak("Modo de voz desativado.");
+  }
+
+  function speak(message) {
+    if (isSpeaking) return;
+    isSpeaking = true;
+    mouthElement.style.animationPlayState = "running";
+
+    const utterance = new SpeechSynthesisUtterance(message);
+    utterance.lang = "pt-BR";
+
+    utterance.onend = () => {
+      isSpeaking = false;
+      mouthElement.style.animationPlayState = "paused";
+    };
+
+    speechSynthesis.speak(utterance);
+  }
+
+  function parseNumber(text) {
+    const words = text.split(" ");
+    for (let word of words) {
+      if (numberMap[word]) return numberMap[word];
+    }
+    const numericMatch = text.match(/\d+/);
+    return numericMatch ? parseInt(numericMatch[0]) : null;
+  }
+
+  function setTimer(minutes, hours, reason) {
+    const totalMilliseconds = ((hours * 60) + minutes) * 60 * 1000;
+    const timeText = `${hours ? `${hours} hora${hours > 1 ? 's' : ''}` : ''} ${minutes ? `${minutes} minuto${minutes > 1 ? 's' : ''}` : ''}`.trim();
+
+    if (totalMilliseconds > 0) {
+      speak(`Alarme definido para ${timeText}. Motivo: ${reason}.`);
+      const timerId = new Date().getTime(); // Cria um identificador único para o timer
+
+      const timerElement = document.createElement("div");
+      timerElement.classList.add("timer");
+      timerElement.id = `timer-${timerId}`;
+      timerElement.innerHTML = `<strong>Timer ${timerId}</strong><br>Motivo: ${reason}<br><div id="countdown-${timerId}">Contagem regressiva: ${timeText}</div>`;
+      timerContainer.appendChild(timerElement);
+
+      let timeRemaining = totalMilliseconds;
+
+      const countdownInterval = setInterval(() => {
+        if (timeRemaining <= 0) {
+          clearInterval(countdownInterval);
+          speak(`O tempo acabou! Hora de ${reason}.`);
+          document.getElementById(`countdown-${timerId}`).textContent = `Tempo expirado!`;
+        } else {
+          timeRemaining -= 1000;
+          const minutesLeft = Math.floor(timeRemaining / 60000);
+          const secondsLeft = Math.floor((timeRemaining % 60000) / 1000);
+          document.getElementById(`countdown-${timerId}`).textContent = `${minutesLeft}m ${secondsLeft}s restantes`;
+        }
+      }, 1000);
+
+      // Adiciona o timer à lista de timers
+      timers.push({ minutes, hours, reason, countdownInterval, timerId });
+    } else {
+      speak("Por favor, diga um tempo válido para marcar.");
+    }
+  }
+
+  function handleTimerCommand(input) {
+    const minutes = parseNumber(input.match(/(\d+|um|dois|três|quatro|cinco|seis|sete|oito|nove|dez|onze|doze|treze|quatorze|quinze|dezesseis|dezessete|dezoito|dezenove|vinte)\s*minutos?/i)?.[0] || "");
+    const hours = parseNumber(input.match(/(\d+|um|dois|três|quatro|cinco|seis|sete|oito|nove|dez|onze|doze|treze|quatorze|quinze|dezesseis|dezessete|dezoito|dezenove|vinte)\s*horas?/i)?.[0] || "");
+
+    if (minutes || hours) {
+      pendingTimer = { minutes: minutes || 0, hours: hours || 0 };
+      speak("Para qual motivo você quer marcar este tempo?");
+      awaitingReason = true;
+    } else {
+      speak("Desculpe, não consegui entender o tempo que você quer marcar.");
+    }
+  }
+
+  function handleReasonCommand(input) {
+    if (pendingTimer) {
+      const { minutes, hours } = pendingTimer;
+      speak(`Marcando o tempo para ${input}.`);
+      setTimer(minutes, hours, input);
+      pendingTimer = null;
+      awaitingReason = false;
+    } else {
+      speak("Nenhum temporizador foi configurado. Por favor, diga o tempo novamente.");
+    }
+  }
+</script>
+
+</body>
+</html>

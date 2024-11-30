@@ -1,0 +1,277 @@
+ <!DOCTYPE html>
+ <html lang="pt-BR">
+ <head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ 
+<style>
+ body {
+ margin: 0px;
+ background-color: #F2F2F2;
+ font-family: Roboto, sans-serif;
+
+ }
+   
+ header {
+ background-color: #00FF7F;
+ padding: 5px;
+ align-items: center;
+ border-bottom: 1px solid #f2f2f2;
+ display: flex;
+
+ }
+   
+ .text {
+ color: black;
+ font-size: 20px;
+ font-weight: bold;
+ text-align: center;
+ margin-top: 30px;
+ margin-bottom: 30px;
+ margin-left: 20px;
+ margin-right: 20px;
+
+ } 
+   
+ h1 {
+ flex: 1;
+ color: #666;
+ font-size: 24px;
+ outline: none;
+
+ }
+
+ img {
+ width: 50px;
+ margin-right: 15px;
+ height: 50px;
+ border-radius: 40px;
+ cursor: pointer;
+ margin-left: 10px;
+
+ }
+ 
+ button {
+ padding: 10px 20px;
+ margin-left: 140px;
+ margin-top: 50px;
+ font-weight: bold;
+ font-size: 18px;
+ background: #00FF7F;
+ color: #666;
+ border: none;
+ border-radius: 5px;
+   
+ }
+    
+ button:hover {
+ background-color: none;
+   
+ }
+    
+ .mouth {
+ position: relative;
+ display: inline-block;
+ width: 50px;
+ height: 30px;
+ background-color: white;
+ border-radius: 100px 100px 0px 0px;
+ margin-left: 42%;
+ animation: mouthAnimation 1s infinite;
+    
+ }
+    
+ .text-output {
+ margin-left: 20px;
+ max-width: 280px;
+ padding: 20px;
+ background: white;
+ border-radius: 10px;
+ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+ font-size: 18px;
+ text-align: left;
+ overflow-y: auto;
+ max-height: 300px;
+    
+ }
+   
+ @keyframes mouthAnimation {
+ 0% { height: 30px; }
+ 50% { height: 35px; }
+ 100% { height: 30px; }
+   
+ }
+  
+ </style>
+ </head>
+ <body>
+  
+ 
+
+ <div class="header-menu-container">
+ <header>
+ <input type="file" id="imagemInput" accept="image/*" style="display: none;">
+ <img id="logo" src="" alt="foto" onclick="selecionarImagem()">
+ <h1 id="headerText" onclick="habilitarEdicao()" contenteditable="true" onkeydown="preventLineBreak(event)">Digite seu nome</h1>
+ <header>
+ </div>
+
+ <div class="text">Assistente de mensagens</div>
+ <div class="mouth" id="mouth"></div>
+ <div class="text-output" id="textOutput"></div>
+ <button onclick="startListening()">Falar</button>
+ </div>
+ </div>
+
+
+ <script defer src="caminho.js"></script>
+
+ <script>
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = "pt-BR";
+
+    const textOutput = document.getElementById("textOutput");
+    const mouthElement = document.getElementById("mouth");
+    let isSpeaking = false;
+    let mode = ""; // Controle de estado
+    let capturedMessage = ""; // Mensagem capturada
+    let phoneNumber = ""; // Número capturado
+
+    function startListening() {
+      recognition.start();
+
+      recognition.onstart = () => {
+        console.log("Estou ouvindo...");
+      };
+
+      recognition.onresult = (event) => {
+        const userSpeech = event.results[0][0].transcript.toLowerCase().trim();
+        console.log("Texto reconhecido:", userSpeech);
+
+        if (mode === "") {
+          if (userSpeech.includes("envie a mensagem para o whatsapp")) {
+            mode = "requestingNumber";
+            capturedMessage = textOutput.textContent.trim(); // Captura a mensagem atual
+            speak("Ok, me forneça o DDD e o número.");
+          } else {
+            textOutput.textContent += `\n${userSpeech}`;
+            speak(`Você disse: ${userSpeech}`);
+          }
+        } else if (mode === "requestingNumber") {
+          phoneNumber = userSpeech.replace(/\D/g, ""); // Filtra apenas os números
+          if (phoneNumber.length >= 10 && phoneNumber.length <= 11) {
+            mode = ""; // Reseta o estado
+            speak("Número capturado. Enviando a mensagem para o WhatsApp.");
+            redirectToWhatsApp(phoneNumber, capturedMessage || "Olá, esta é uma mensagem enviada automaticamente.");
+          } else {
+            speak("Número inválido. Por favor, diga novamente com o DDD e o número.");
+          }
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.error("Erro de reconhecimento de fala:", event.error);
+      };
+    }
+
+    function speak(message) {
+      if (isSpeaking) return;
+      isSpeaking = true;
+      mouthElement.style.animationPlayState = "running";
+
+      const utterance = new SpeechSynthesisUtterance(message);
+      utterance.lang = "pt-BR";
+
+      utterance.onend = () => {
+        isSpeaking = false;
+        mouthElement.style.animationPlayState = "paused";
+      };
+
+      speechSynthesis.speak(utterance);
+    }
+
+    function redirectToWhatsApp(phone, message) {
+      // Usar esquema URI específico para abrir o app do WhatsApp
+      const whatsappAppUri = `intent://send/?phone=55${phone}&text=${encodeURIComponent(message)}#Intent;scheme=whatsapp;package=com.whatsapp;end`;
+      window.location.href = whatsappAppUri; // Redireciona para o WhatsApp diretamente
+    }
+ </script>
+
+
+
+
+ 
+<script>
+    function redirecionar(url) {
+        window.location.href = url;
+    }
+
+    // Função para habilitar a edição do cabeçalho
+    function habilitarEdicao() {
+        var header = document.getElementById("headerText");
+        header.focus();
+    }
+
+    // Função para selecionar e exibir uma imagem
+    function selecionarImagem() {
+        var imagemInput = document.getElementById("imagemInput");
+        imagemInput.click();
+
+        imagemInput.addEventListener("change", function () {
+            var logo = document.getElementById("logo");
+            var file = imagemInput.files[0];
+            var reader = new FileReader();
+
+            reader.onload = function () {
+                logo.src = reader.result;
+                // Salvar a imagem no armazenamento local
+                localStorage.setItem("imagem", reader.result);
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // Carregar imagem do armazenamento local ao carregar a página
+    var imagemSalva = localStorage.getItem("imagem");
+    if (imagemSalva) {
+        var logo = document.getElementById("logo");
+        logo.src = imagemSalva;
+    }
+
+    // Prevenir quebra de linha e limitar overflow
+    function preventOverflow(element) {
+        element.style.whiteSpace = "nowrap";
+        element.style.overflow = "hidden";
+        element.style.textOverflow = "ellipsis";
+    }
+
+    function preventLineBreak(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+        }
+    }
+
+    // Aplicar a função de prevenir overflow no h1 do cabeçalho
+    var headerText = document.getElementById("headerText");
+    preventOverflow(headerText);
+
+    headerText.addEventListener("input", function () {
+        // Salvar o texto do cabeçalho no armazenamento local
+        localStorage.setItem("cabecalho", headerText.textContent);
+    });
+
+    // Carregar texto do cabeçalho do armazenamento local ao carregar a página
+    var cabecalhoSalvo = localStorage.getItem("cabecalho");
+    if (cabecalhoSalvo) {
+        headerText.textContent = cabecalhoSalvo;
+    }
+</script>
+
+ </body>
+ </html>
+
+

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+ body {
+ font-family: Roboto, sans-serif;
+ margin: 0px;
+ background: white;
+
+ }
+  
+ header {
+ background-color: #00FF7F;
+ padding: 5px;
+ align-items: center;
+ border-bottom: 1px solid #f2f2f2;
+ display: flex;
+
+ }
+   
+ .text {
+ color: black;
+ font-size: 2px;
+ font-weight: bold;
+ text-align: center;
+ margin-top: 30px;
+ margin-bottom: 30px;
+ margin-left: 20px;
+ margin-right: 20px;
+
+ } 
+   
+ h1 {
+ flex: 1;
+ color: #666;
+ font-size: 24px;
+ outline: none;
+ 
+ }
+
+ img {
+ width: 50px;
+ margin-right: 15px;
+ height: 50px;
+ border-radius: 40px;
+ cursor: pointer;
+ margin-left: 10px;
+
+ }
+ 
+ .title {
+ color:  black;
+ font-size: 22px;
+ font-weight: bold;
+ text-align: center;
+ margin-top: 30px;
+ margin-bottom: 30px;
+ margin-left: 20px;
+ margin-right: 20px;
+
+ } 
+   
+ .card {
+ display: inline-block;
+ margin-right: 100px; /* Para adicionar algum espaço entre os cards */
+
+ }
+
+ button {
+ padding: 10px 20px;
+ font-size: 16px;
+ cursor: pointer;
+ background-color: #00FF7F;
+ color: #666;
+ border: none;
+ border-radius: 5px;
+ margin-left: 52px;
+ font-weight: bold;
+ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  
+ }
+    
+ button:hover {
+ background-color: #45a049;
+    
+ }
+    
+ .mouth {
+ position: relative;
+ display: inline-block;
+ width: 50px;
+ height: 30px;
+ background-color: white;
+ border-radius: 100px 100px 0px 0px;
+ margin: 20px 0;
+ animation: mouthAnimation 1s infinite;
+ margin-left: 40%;
+
+ }
+    
+ textarea {
+ width: 337px;
+ height: 500px;
+ margin-top: 20px;
+ padding: 10px;
+ font-size: 16px;
+ border-radius: 5px;
+ border: 1px solid white;
+ background: white;
+ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+ outline: none; 
+ 
+}
+   
+ @keyframes mouthAnimation {
+ 0% { height: 30px; }
+ 50% { height: 35px; }
+ 100% { height: 30px; }
+    
+ }
+ 
+ .button-container {
+ display: flex;    
+ gap: 10px;           
+ 
+}
+  
+ .button-container button {
+ padding: 10px 20px;
+ font-size: 16px;
+ cursor: pointer;
+  
+ }
+
+ </style>
+ </head>
+ <body>
+ 
+ <div class="header-menu-container">
+ <header>
+ <input type="file" id="imagemInput" accept="image/*" style="display: none;">
+ <img id="logo" src="" alt="foto" onclick="selecionarImagem()">
+ <h1 id="headerText" onclick="habilitarEdicao()" contenteditable="true">Digite seu nome</h1>
+ </header>
+ </div>
+
+ <div class="title">Assistente de Voz</div>
+ <div class="mouth" id="mouth"></div>
+ </div>
+ </div>
+ 
+ <div class="button-container">
+ <button onclick="speakText()">Falar</button>
+ <button onclick="speakFast()">Voz grossa</button>
+ </div>
+ 
+ <textarea id="userText" placeholder="Digite suas palavras aqui..."></textarea><br>
+ </div>
+ </div>
+  
+ <script>
+    const mouthElement = document.getElementById("mouth");
+    const userText = document.getElementById("userText");
+    let isSpeaking = false;
+    let maleVoice = null;
+
+    // Função para obter a voz masculina grossa
+    function setMaleVoice() {
+      const voices = speechSynthesis.getVoices();
+      maleVoice = voices.find(voice => voice.name.toLowerCase().includes("male") && voice.lang === "pt-BR");
+    }
+
+    // Função para a IA falar o texto digitado normalmente
+    function speakText() {
+      const message = userText.value.trim(); // Obtém o texto digitado
+
+      if (!message) {
+        alert("Por favor, digite algum texto!");
+        return;
+      }
+
+      if (isSpeaking) return;
+      isSpeaking = true;
+      mouthElement.style.animationPlayState = "running";
+
+      const utterance = new SpeechSynthesisUtterance(message);
+      utterance.lang = "pt-BR";
+      if (maleVoice) {
+        utterance.voice = maleVoice; // Define a voz masculina
+      }
+      
+      utterance.onend = () => {
+        isSpeaking = false;
+        mouthElement.style.animationPlayState = "paused";
+      };
+
+      speechSynthesis.speak(utterance);
+    }
+
+    // Função para a IA falar mais rápido
+    function speakFast() {
+      const message = userText.value.trim(); // Obtém o texto digitado
+
+      if (!message) {
+        alert("Por favor, digite algum texto!");
+        return;
+      }
+
+      if (isSpeaking) return;
+      isSpeaking = true;
+      mouthElement.style.animationPlayState = "running";
+
+      const utterance = new SpeechSynthesisUtterance(message);
+      utterance.lang = "pt-BR";
+      if (maleVoice) {
+        utterance.voice = maleVoice; // Define a voz masculina
+      }
+      utterance.volume = 1; // Volume normal
+      utterance.rate = 1; // Fala mais rápida
+      utterance.pitch = 0.50; // Ajuste para deixar a voz mais grossa
+
+      utterance.onend = () => {
+        isSpeaking = false;
+        mouthElement.style.animationPlayState = "paused";
+      };
+
+      speechSynthesis.speak(utterance);
+    }
+
+    // Aguarda as vozes serem carregadas
+    speechSynthesis.onvoiceschanged = setMaleVoice;
+
+    // Carrega a voz masculina ao inicializar
+    window.onload = setMaleVoice;
+ </script>
+
+
+
+ <script>
+    function redirecionar(url) {
+        window.location.href = url;
+    }
+
+    // Função para habilitar a edição do cabeçalho
+    function habilitarEdicao() {
+        var header = document.getElementById("headerText");
+        header.focus();
+    }
+
+    // Função para selecionar e exibir uma imagem
+    function selecionarImagem() {
+        var imagemInput = document.getElementById("imagemInput");
+        imagemInput.click();
+
+        imagemInput.addEventListener("change", function () {
+            var logo = document.getElementById("logo");
+            var file = imagemInput.files[0];
+            var reader = new FileReader();
+
+            reader.onload = function () {
+                logo.src = reader.result;
+                // Salvar a imagem no armazenamento local
+                localStorage.setItem("imagem", reader.result);
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // Carregar imagem do armazenamento local ao carregar a página
+    var imagemSalva = localStorage.getItem("imagem");
+    if (imagemSalva) {
+        var logo = document.getElementById("logo");
+        logo.src = imagemSalva;
+    }
+
+    // Prevenir quebra de linha e limitar overflow
+    function preventOverflow(element) {
+        element.style.whiteSpace = "nowrap";
+        element.style.overflow = "hidden";
+        element.style.textOverflow = "ellipsis";
+    }
+
+    function preventLineBreak(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+        }
+    }
+
+    // Aplicar a função de prevenir overflow no h1 do cabeçalho
+    var headerText = document.getElementById("headerText");
+    preventOverflow(headerText);
+
+    headerText.addEventListener("input", function () {
+        // Salvar o texto do cabeçalho no armazenamento local
+        localStorage.setItem("cabecalho", headerText.textContent);
+    });
+
+    // Carregar texto do cabeçalho do armazenamento local ao carregar a página
+    var cabecalhoSalvo = localStorage.getItem("cabecalho");
+    if (cabecalhoSalvo) {
+        headerText.textContent = cabecalhoSalvo;
+    }
+</script>
+
+</body>
+</html>
